@@ -5,26 +5,75 @@ import { toast } from "react-toastify";
 
 
 const Register = () => {
-    const [formData,setFromData] = useState({
+    const [formData,setFormData] = useState({
         name: "",
         email: "",
         password: "",
         conpassword: ""
     });
     const navigate = useNavigate();
+    const [errors, setErrors] = useState({
+        name: "",
+        email: "",
+        password: "",
+        conpassword: ""
+    });
 
+    const validateForm = (name: string, value:string) => {
+        let errorMessage = "";
+        
+        if(name=== "name" && value.length<3){
+            errorMessage = "Name must be at least 3 characters long!";
+        }
+
+        if(name === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)){
+            errorMessage = "Invalid email format!";
+        }
+
+        if(name === "password" && value.length<6){
+            errorMessage = "Password must be at least 6 characters long!";
+        }
+
+        if(name === "conpassword" && value !== formData.password){
+            errorMessage = "Passwords do not match!";
+        }
+        
+        setErrors(prev => ({...prev, [name]: errorMessage}));
+    }
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const {name, value} = e.target;
+        setFormData({...formData, [name]: value});
+        validateForm(name, value);
+
+    }
+    console.log(formData);
     const handleSumbit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        if (formData.password !== formData.conpassword) {
+            return toast.error("Passwords do not match!");
+        }
+
         try {
-            const res = await API.post('/users/register', formData);
+            const dataToSubmit = {
+                name: formData.name,
+                email: formData.email.toLowerCase().trim(),
+                password: formData.password
+            };
+
+            const res = await API.post('/auth/register', dataToSubmit);
+
             localStorage.setItem('token', res.data.token);
             toast.success('Registration successful!');
+
             navigate('/login');
         } catch (error: any) {
             toast.error('Registration failed!');
         }
     }
+
+    
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 p-10">
   {/* Main Container */}
@@ -42,21 +91,24 @@ const Register = () => {
         <div className="flex flex-col gap-1.5">
           <label htmlFor="name" className="font-semibold text-gray-700 ml-1">Name</label>
           <input 
+            name="name"
             className="w-full border border-gray-300 rounded-lg py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
             type="text" 
             placeholder="Enter your name" 
-            onChange={(e) => setFromData({...formData, name: e.target.value})} 
-          /> 
+            onChange={handleChange} 
+          />
+           {errors.name && <span className="text-red-500 text-xs ml-1 font-medium italic">{errors.name}</span>}
         </div>
 
         {/* Email Field */}
         <div className="flex flex-col gap-1.5">
           <label htmlFor="email" className="font-semibold text-gray-700 ml-1">Email</label>
           <input 
+            name="email"
             className="w-full border border-gray-300 rounded-lg py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
             type="email" 
             placeholder="example@mail.com" 
-            onChange={(e) => setFromData({...formData, email: e.target.value})} 
+            onChange={handleChange} 
           />
         </div>
 
@@ -64,10 +116,11 @@ const Register = () => {
         <div className="flex flex-col gap-1.5">
           <label htmlFor="password" className="font-semibold text-gray-700 ml-1">Password</label>
           <input 
+            name='password'
             className="w-full border border-gray-300 rounded-lg py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
             type="password" 
             placeholder="••••••••" 
-            onChange={(e) => setFromData({...formData, password: e.target.value})} 
+            onChange={handleChange} 
           />
         </div>
 
@@ -75,11 +128,13 @@ const Register = () => {
         <div className="flex flex-col gap-1.5">
           <label htmlFor="conpassword" className="font-semibold text-gray-700 ml-1">Confirm Password</label>
           <input 
+            name="conpassword"
             className="w-full border border-gray-300 rounded-lg py-2.5 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" 
             type="password" 
             placeholder="••••••••" 
-            onChange={(e) => setFromData({...formData, conpassword: e.target.value})} 
+            onChange={handleChange} 
           />
+          {errors.conpassword && <span className="text-red-500 text-xs ml-1 font-medium italic">{errors.conpassword}</span>}
         </div>
 
         {/* Register Button */}

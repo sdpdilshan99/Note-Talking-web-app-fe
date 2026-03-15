@@ -1,13 +1,30 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import API from '../api/axios';
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const { login } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log("Logging in with:", formData);
+    try {
+        const normalizedData = {...formData,email: formData.email.toLowerCase().trim() };
+
+        const res = await API.post('auth/login', normalizedData);
+        
+        login(res.data, res.data.token);
+        console.log("Logged in user data:",res.data);
+        toast.success('Login successful!');
+        navigate('/');
+    } catch (error: any) {
+        const errorMessage = error.response?.data?.message || 'Login failed!';
+        toast.error(errorMessage);
+    }
   };
 
   return (

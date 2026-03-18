@@ -1,7 +1,8 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import API from "../api/axios";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
 
 
 const Register = () => {
@@ -11,6 +12,7 @@ const Register = () => {
         password: "",
         conpassword: ""
     });
+    const {token} = useAuth();
     const navigate = useNavigate();
     const [errors, setErrors] = useState({
         name: "",
@@ -40,6 +42,12 @@ const Register = () => {
         
         setErrors(prev => ({...prev, [name]: errorMessage}));
     }
+
+     useEffect(() => {
+        if (token) {
+          navigate('/'); 
+        }
+      }, [token, navigate]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const {name, value} = e.target;

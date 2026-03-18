@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
-import Register from './pages/register'
 import Login from './pages/Login'
 import { AuthProvider } from './context/AuthContext'
 import Dashboard from './pages/Dashboard'
 import { ToastContainer } from 'react-toastify'
 import ProtectedRoute from './components/ProtectedRoute'
+import Register from './pages/Register'
 
 function App() {
   return (

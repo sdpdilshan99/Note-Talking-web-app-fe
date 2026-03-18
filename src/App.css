@@ -1,0 +1,20 @@
+/* මුළු Editor එකේම උස පාලනය කරන්න */
+.quill {
+  height: 50vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Toolbar එකට නියමිත උස ගන්න ඉඩ දෙන්න */
+.ql-toolbar {
+  flex-shrink: 0;
+}
+
+/* අකුරු ලියන කොටසට ඉතිරි ඉඩ ප්‍රමාණය දීලා ඒක ඇතුළේ විතරක් scroll වෙන්න ඉඩ දෙන්න */
+.ql-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  padding-bottom: 5px;
+}
